@@ -67,7 +67,7 @@ func (s *Service) ChangePassword(rawToken, newPassword string) error {
 		slog.Warn("failed to delete verification", "verification_id", ver.ID, "error", err)
 	}
 
-	s.callHook(s.config.Hooks.OnChangedPassword, u)
+	s.callHook(s.config.Hooks.OnPasswordChanged, u)
 
 	return nil
 }

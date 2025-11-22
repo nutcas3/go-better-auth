@@ -106,7 +106,7 @@ func (s *Service) ConfirmEmailChange(rawToken string) (*EmailChangeResult, error
 		slog.Warn("failed to delete verification", "verification_id", ver.ID, "error", err)
 	}
 
-	s.callHook(s.config.Hooks.OnChangedEmail, user)
+	s.callHook(s.config.Hooks.OnEmailChanged, user)
 
 	return &EmailChangeResult{
 		Message: "Email changed successfully",
