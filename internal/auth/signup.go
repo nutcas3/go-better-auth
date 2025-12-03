@@ -102,7 +102,7 @@ func (s *Service) SignUpWithEmailAndPassword(name string, email string, password
 		}
 	}
 
-	s.callHook(s.config.Hooks.OnUserSignedUp, newUser)
+	s.callHook(s.config.EventHooks.OnUserSignedUp, newUser)
 
 	return &SignUpResult{
 		Token: sessionToken,

@@ -6,96 +6,6 @@ import (
 )
 
 // =======================
-// Main Config Structure
-// =======================
-
-// Config holds all configurable options for the GoBetterAuth library.
-type Config struct {
-	AppName           string
-	BaseURL           string
-	BasePath          string
-	Secret            string
-	Database          DatabaseConfig
-	EmailPassword     EmailPasswordConfig
-	EmailVerification EmailVerificationConfig
-	User              UserConfig
-	Session           SessionConfig
-	TrustedOrigins    TrustedOriginsConfig
-	DatabaseHooks     DatabaseHooksConfig
-	Hooks             HooksConfig
-}
-
-// =======================
-// Functional Options
-// =======================
-
-type ConfigOption func(*Config)
-
-// NewConfig builds a Config using functional options with sensible defaults.
-func NewConfig(opts ...ConfigOption) *Config {
-	baseURL := os.Getenv("GO_BETTER_AUTH_BASE_URL")
-	if baseURL == "" {
-		baseURL = "http://localhost:8080"
-	}
-
-	secret := os.Getenv("GO_BETTER_AUTH_SECRET")
-	if secret == "" {
-		env := os.Getenv("GO_ENV")
-		// Must be set in production
-		if env == "production" {
-			panic("GO_BETTER_AUTH_SECRET environment variable must be set in production")
-		}
-		// Use default secret for non-production environments
-		secret = "go-better-auth-secret-0123456789"
-	}
-
-	// Define sensible defaults first
-	c := &Config{
-		AppName:  "GoBetterAuth",
-		BaseURL:  baseURL,
-		BasePath: "/auth",
-		Secret:   secret,
-		Database: DatabaseConfig{
-			MaxOpenConns:    25,
-			MaxIdleConns:    5,
-			ConnMaxLifetime: time.Hour,
-		},
-		EmailPassword: EmailPasswordConfig{
-			Enabled:                  false,
-			RequireEmailVerification: false,
-			MinPasswordLength:        8,
-			MaxPasswordLength:        32,
-		},
-		EmailVerification: EmailVerificationConfig{
-			AutoSignIn:   false,
-			SendOnSignUp: false,
-			SendOnSignIn: false,
-			ExpiresIn:    1 * time.Hour,
-		},
-		User: UserConfig{
-			ChangeEmail: ChangeEmailConfig{},
-		},
-		Session: SessionConfig{
-			CookieName: "go-better-auth.session_token",
-			ExpiresIn:  7 * 24 * time.Hour, // (default: 7 days)
-			UpdateAge:  24 * time.Hour,
-		},
-		TrustedOrigins: TrustedOriginsConfig{
-			Origins: []string{},
-		},
-		DatabaseHooks: DatabaseHooksConfig{},
-		Hooks:         HooksConfig{},
-	}
-
-	// Apply the options
-	for _, opt := range opts {
-		opt(c)
-	}
-
-	return c
-}
-
-// =======================
 // Database Config
 // =======================
 
@@ -211,15 +121,105 @@ type VerificationDatabaseHooksConfig struct {
 }
 
 // =======================
-// Hooks Config
+// EventHooks Config
 // =======================
 
-type HooksConfig struct {
+type EventHooksConfig struct {
 	OnUserSignedUp    func(user User) error
 	OnUserLoggedIn    func(user User) error
 	OnEmailVerified   func(user User) error
 	OnPasswordChanged func(user User) error
 	OnEmailChanged    func(user User) error
+}
+
+// =======================
+// Main Config Structure
+// =======================
+
+// Config holds all configurable options for the GoBetterAuth library.
+type Config struct {
+	AppName           string
+	BaseURL           string
+	BasePath          string
+	Secret            string
+	Database          DatabaseConfig
+	EmailPassword     EmailPasswordConfig
+	EmailVerification EmailVerificationConfig
+	User              UserConfig
+	Session           SessionConfig
+	TrustedOrigins    TrustedOriginsConfig
+	DatabaseHooks     DatabaseHooksConfig
+	EventHooks        EventHooksConfig
+}
+
+// =======================
+// Functional Options
+// =======================
+
+type ConfigOption func(*Config)
+
+// NewConfig builds a Config using functional options with sensible defaults.
+func NewConfig(opts ...ConfigOption) *Config {
+	baseURL := os.Getenv("GO_BETTER_AUTH_BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:8080"
+	}
+
+	secret := os.Getenv("GO_BETTER_AUTH_SECRET")
+	if secret == "" {
+		env := os.Getenv("GO_ENV")
+		// Must be set in production
+		if env == "production" {
+			panic("GO_BETTER_AUTH_SECRET environment variable must be set in production")
+		}
+		// Use default secret for non-production environments
+		secret = "go-better-auth-secret-0123456789"
+	}
+
+	// Define sensible defaults first
+	c := &Config{
+		AppName:  "GoBetterAuth",
+		BaseURL:  baseURL,
+		BasePath: "/auth",
+		Secret:   secret,
+		Database: DatabaseConfig{
+			MaxOpenConns:    25,
+			MaxIdleConns:    5,
+			ConnMaxLifetime: time.Hour,
+		},
+		EmailPassword: EmailPasswordConfig{
+			Enabled:                  false,
+			RequireEmailVerification: false,
+			MinPasswordLength:        8,
+			MaxPasswordLength:        32,
+		},
+		EmailVerification: EmailVerificationConfig{
+			AutoSignIn:   false,
+			SendOnSignUp: false,
+			SendOnSignIn: false,
+			ExpiresIn:    1 * time.Hour,
+		},
+		User: UserConfig{
+			ChangeEmail: ChangeEmailConfig{},
+		},
+		Session: SessionConfig{
+			CookieName: "go-better-auth.session_token",
+			ExpiresIn:  7 * 24 * time.Hour, // (default: 7 days)
+			UpdateAge:  24 * time.Hour,
+		},
+		TrustedOrigins: TrustedOriginsConfig{
+			Origins: []string{},
+		},
+		DatabaseHooks: DatabaseHooksConfig{},
+		EventHooks:    EventHooksConfig{},
+	}
+
+	// Apply the options
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	return c
 }
 
 // =======================
@@ -292,8 +292,8 @@ func WithDatabaseHooks(databaseHooksConfig DatabaseHooksConfig) ConfigOption {
 	}
 }
 
-func WithHooks(hooksConfig HooksConfig) ConfigOption {
+func WithEventHooks(eventHooksConfig EventHooksConfig) ConfigOption {
 	return func(c *Config) {
-		c.Hooks = hooksConfig
+		c.EventHooks = eventHooksConfig
 	}
 }

@@ -33,18 +33,18 @@ func (s *Service) ChangePassword(rawToken, newPassword string) error {
 		return ErrUserNotFound
 	}
 
-	u, err := s.UserService.GetUserByID(*ver.UserID)
+	user, err := s.UserService.GetUserByID(*ver.UserID)
 	if err != nil {
 		slog.Error("failed to get user", "user_id", *ver.UserID, "error", err)
 		return fmt.Errorf("%w: %w", ErrUserNotFound, err)
 	}
-	if u == nil {
+	if user == nil {
 		return ErrUserNotFound
 	}
 
-	acc, err := s.AccountService.GetAccountByUserID(u.ID)
+	acc, err := s.AccountService.GetAccountByUserID(user.ID)
 	if err != nil {
-		slog.Error("failed to get account", "user_id", u.ID, "error", err)
+		slog.Error("failed to get account", "user_id", user.ID, "error", err)
 		return fmt.Errorf("%w: %w", ErrAccountNotFound, err)
 	}
 	if acc == nil {
@@ -67,7 +67,7 @@ func (s *Service) ChangePassword(rawToken, newPassword string) error {
 		slog.Warn("failed to delete verification", "verification_id", ver.ID, "error", err)
 	}
 
-	s.callHook(s.config.Hooks.OnPasswordChanged, u)
+	s.callHook(s.config.EventHooks.OnPasswordChanged, user)
 
 	return nil
 }

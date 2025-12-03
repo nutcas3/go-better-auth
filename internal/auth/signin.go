@@ -63,7 +63,7 @@ func (s *Service) SignInWithEmailAndPassword(email string, password string, call
 		return nil, fmt.Errorf("%w: %w", ErrSessionCreationFailed, err)
 	}
 
-	s.callHook(s.config.Hooks.OnUserLoggedIn, user)
+	s.callHook(s.config.EventHooks.OnUserLoggedIn, user)
 
 	if s.config.EmailVerification.SendOnSignIn && !user.EmailVerified {
 		token, err := s.TokenService.GenerateToken()
