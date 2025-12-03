@@ -33,7 +33,7 @@ type ConfigOption func(*Config)
 
 // NewConfig builds a Config using functional options with sensible defaults.
 func NewConfig(opts ...ConfigOption) *Config {
-	baseURL := os.Getenv("GO_BETTER_AUTH_URL")
+	baseURL := os.Getenv("GO_BETTER_AUTH_BASE_URL")
 	if baseURL == "" {
 		baseURL = "http://localhost:8080"
 	}
