@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -40,9 +41,11 @@ func (s *SessionService) CreateSession(userID string, token string) (*domain.Ses
 	}
 
 	if s.config.DatabaseHooks.Sessions != nil && s.config.DatabaseHooks.Sessions.AfterCreate != nil {
-		if err := s.config.DatabaseHooks.Sessions.AfterCreate(*session); err != nil {
-			return nil, err
-		}
+		go func() {
+			if err := s.config.DatabaseHooks.Sessions.AfterCreate(*session); err != nil {
+				slog.Error("session after create hook failed", "error", err.Error())
+			}
+		}()
 	}
 
 	return session, nil

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -38,9 +39,11 @@ func (s *VerificationService) CreateVerification(v *domain.Verification) error {
 	}
 
 	if s.config.DatabaseHooks.Verifications != nil && s.config.DatabaseHooks.Verifications.AfterCreate != nil {
-		if err := s.config.DatabaseHooks.Verifications.AfterCreate(*v); err != nil {
-			return err
-		}
+		go func() {
+			if err := s.config.DatabaseHooks.Verifications.AfterCreate(*v); err != nil {
+				slog.Error("verification after create hook failed", "error", err.Error())
+			}
+		}()
 	}
 
 	return nil

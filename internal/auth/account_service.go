@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -37,9 +38,11 @@ func (s *AccountService) CreateAccount(a *domain.Account) error {
 	}
 
 	if s.config.DatabaseHooks.Accounts != nil && s.config.DatabaseHooks.Accounts.AfterCreate != nil {
-		if err := s.config.DatabaseHooks.Accounts.AfterCreate(*a); err != nil {
-			return err
-		}
+		go func() {
+			if err := s.config.DatabaseHooks.Accounts.AfterCreate(*a); err != nil {
+				slog.Error("account after create hook failed", "error", err.Error())
+			}
+		}()
 	}
 
 	return nil
@@ -76,9 +79,11 @@ func (s *AccountService) UpdateAccount(account *domain.Account) error {
 	}
 
 	if s.config.DatabaseHooks.Accounts != nil && s.config.DatabaseHooks.Accounts.AfterUpdate != nil {
-		if err := s.config.DatabaseHooks.Accounts.AfterUpdate(*account); err != nil {
-			return err
-		}
+		go func() {
+			if err := s.config.DatabaseHooks.Accounts.AfterUpdate(*account); err != nil {
+				slog.Error("account after update hook failed", "error", err.Error())
+			}
+		}()
 	}
 
 	return nil

@@ -203,8 +203,6 @@ type AccountDatabaseHooksConfig struct {
 type SessionDatabaseHooksConfig struct {
 	BeforeCreate func(session *Session) error
 	AfterCreate  func(session Session) error
-	BeforeUpdate func(session *Session) error
-	AfterUpdate  func(session Session) error
 }
 
 type VerificationDatabaseHooksConfig struct {
