@@ -55,7 +55,7 @@ func (s *Service) EmailChange(userID string, newEmail string, callbackURL *strin
 			callbackURL,
 		)
 		go func() {
-			if err := s.config.User.ChangeEmail.SendEmailChangeVerification(*user, newEmail, url, token); err != nil {
+			if err := s.config.User.ChangeEmail.SendEmailChangeVerificationEmail(*user, newEmail, url, token); err != nil {
 				slog.Error("failed to send email change verification", "user_id", user.ID, "error", err)
 			}
 		}()

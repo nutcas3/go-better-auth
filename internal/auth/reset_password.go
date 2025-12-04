@@ -48,7 +48,7 @@ func (s *Service) ResetPassword(email string, callbackURL *string) error {
 		return fmt.Errorf("failed to create verification: %w", err)
 	}
 
-	if s.config.EmailPassword.SendResetPassword != nil {
+	if s.config.EmailPassword.SendResetPasswordEmail != nil {
 		callbackURL := fmt.Sprintf("%s?token=%s", *callbackURL, token)
 		url := util.BuildVerificationURL(
 			s.config.BaseURL,
@@ -57,7 +57,7 @@ func (s *Service) ResetPassword(email string, callbackURL *string) error {
 			&callbackURL,
 		)
 		go func() {
-			if err := s.config.EmailPassword.SendResetPassword(*user, url, token); err != nil {
+			if err := s.config.EmailPassword.SendResetPasswordEmail(*user, url, token); err != nil {
 				slog.Error("failed to send verification email", "user_id", user.ID, "error", err)
 			}
 		}()

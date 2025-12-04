@@ -29,7 +29,7 @@ type EmailPasswordConfig struct {
 	DisableSignUp            bool
 	RequireEmailVerification bool
 	AutoSignIn               bool
-	SendResetPassword        func(user User, url string, token string) error
+	SendResetPasswordEmail   func(user User, url string, token string) error
 	ResetTokenExpiry         time.Duration
 	Password                 *PasswordConfig
 }
@@ -59,13 +59,13 @@ type EmailVerificationConfig struct {
 // User Config
 // =======================
 
-type UserConfig struct {
-	ChangeEmail ChangeEmailConfig
+type ChangeEmailConfig struct {
+	Enabled                          bool
+	SendEmailChangeVerificationEmail func(user User, newEmail string, url string, token string) error
 }
 
-type ChangeEmailConfig struct {
-	Enabled                     bool
-	SendEmailChangeVerification func(user User, newEmail string, url string, token string) error
+type UserConfig struct {
+	ChangeEmail ChangeEmailConfig
 }
 
 // =======================
