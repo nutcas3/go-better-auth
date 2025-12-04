@@ -146,7 +146,7 @@ func (auth *Auth) Handler() http.Handler {
 	// Routes
 	r.Handle("POST", basePath+"/sign-in/email", signIn.Handler())
 	r.Handle("POST", basePath+"/sign-up/email", signUp.Handler())
-	r.Handle("POST", basePath+"/email-verification", sendEmailVerification.Handler())
+	r.Handle("POST", basePath+"/email-verification", auth.AuthMiddleware()(sendEmailVerification.Handler()))
 	r.Handle("GET", basePath+"/verify-email", verifyEmail.Handler())
 	r.Handle("POST", basePath+"/sign-out", signOut.Handler())
 	r.Handle("POST", basePath+"/reset-password", resetPassword.Handler())
