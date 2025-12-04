@@ -116,7 +116,7 @@ func (s *Service) handleEmailChange(ver *domain.Verification) (*VerifyEmailResul
 }
 
 // SendVerificationEmail generates a verification token and sends a verification email to the user
-func (s *Service) SendVerificationEmail(userID string) error {
+func (s *Service) SendVerificationEmail(userID string, callbackURL *string) error {
 	if userID == "" {
 		return fmt.Errorf("user ID is required")
 	}
@@ -153,7 +153,7 @@ func (s *Service) SendVerificationEmail(userID string) error {
 			s.config.BaseURL,
 			s.config.BasePath,
 			token,
-			nil,
+			callbackURL,
 		)
 		go func() {
 			if err := s.config.EmailVerification.SendVerificationEmail(*u, url, token); err != nil {

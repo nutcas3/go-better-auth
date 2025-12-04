@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/GoBetterAuth/go-better-auth/internal/auth"
@@ -11,6 +12,10 @@ import (
 
 type SendEmailVerificationResponse struct {
 	Message string `json:"message"`
+}
+
+type SendEmailVerificationHandlerPayload struct {
+	CallbackURL *string `json:"callback_url,omitempty"`
 }
 
 type SendEmailVerificationHandler struct {
@@ -25,7 +30,17 @@ func (h *SendEmailVerificationHandler) Handle(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if err := h.AuthService.SendVerificationEmail(userID); err != nil {
+	var payload SendEmailVerificationHandlerPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		util.JSONResponse(w, http.StatusBadRequest, map[string]any{"message": "invalid request"})
+		return
+	}
+	if err := util.Validate.Struct(payload); err != nil {
+		util.JSONResponse(w, http.StatusUnprocessableEntity, map[string]any{"message": err.Error()})
+		return
+	}
+
+	if err := h.AuthService.SendVerificationEmail(userID, payload.CallbackURL); err != nil {
 		util.JSONResponse(w, http.StatusInternalServerError, map[string]any{"message": err.Error()})
 		return
 	}
