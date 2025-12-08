@@ -36,6 +36,7 @@
 - 🔄 **Password Reset** – Secure password reset with customisable email callbacks
 - 🔄 **Change Email** – Securely change your email
 - 🔐 **Session Management** – Secure, customisable session handling with refresh and expiration controls
+- 🌐 **Social OAuth Providers** – Google, GitHub, Discord and more.
 - 💾 **Multiple Database Support** – SQLite, PostgreSQL, MySQL adapters and more, with migration scripts included
 - 📦 **Minimal Dependencies** – Standard library first, production-ready, and framework-agnostic
 - 🧩 **Comprehensive Configuration** – Flexible, type-safe config with sensible defaults and environment variable support
@@ -52,7 +53,6 @@ For more info and a full guide on how to use this library, check out the [Docs](
 
 Planned features:
 
-- 🌐 **Social OAuth Providers** – Google, GitHub, Discord and more.
 - 🔌 **Plugin System** – Extensible plugin architecture for custom business logic and routes. Including flexible plugin interface to implement all kinds of plugins with third party providers.
 - 🛡️ **Enhanced Security** – CSRF protection and more.
 - ⚡ **Rate Limiting** – Configurable, per-endpoint rate limiting with memory or database storage
