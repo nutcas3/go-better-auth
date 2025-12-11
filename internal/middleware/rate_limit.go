@@ -14,7 +14,8 @@ func RateLimitMiddleware(rateLimitService *auth.RateLimitService) func(http.Hand
 
 			clientIP := rateLimitService.GetClientIP(req)
 
-			allowed, err := rateLimitService.Allow(ctx, clientIP, req)
+			key := rateLimitService.BuildKey(clientIP)
+			allowed, err := rateLimitService.Allow(ctx, key, req)
 			if err != nil {
 				util.JSONResponse(w, http.StatusInternalServerError, map[string]any{"message": "rate-limit error"})
 				return

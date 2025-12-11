@@ -99,3 +99,8 @@ func (s *RateLimitService) GetClientIP(req *http.Request) string {
 
 	return req.RemoteAddr
 }
+
+// BuildKey constructs a rate limit key for storage
+func (s *RateLimitService) BuildKey(key string) string {
+	return s.config.RateLimit.Prefix + key
+}

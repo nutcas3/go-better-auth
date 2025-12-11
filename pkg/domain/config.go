@@ -333,7 +333,7 @@ func NewConfig(opts ...ConfigOption) *Config {
 			Window:    1 * time.Minute,
 			Max:       100,
 			Algorithm: RateLimitAlgorithmFixedWindow,
-			Prefix:    "ratelimit:",
+			Prefix:    "rate_limit:",
 			IP: IPConfig{
 				Headers: []string{
 					"x-forwarded-for",
