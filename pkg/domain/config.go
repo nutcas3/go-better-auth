@@ -175,14 +175,14 @@ type EndpointHookContext struct {
 	Path            string
 	Method          string
 	Body            map[string]any
-	Headers         map[string]string
-	Query           map[string]string
+	Headers         map[string][]string
+	Query           map[string][]string
 	Request         *http.Request
 	User            *User
-	ResponseHeaders map[string]string
-	ResponseCookies []*http.Cookie
 	ResponseStatus  int
 	ResponseBody    []byte
+	ResponseHeaders map[string][]string
+	ResponseCookies []*http.Cookie
 }
 
 type EndpointHooksConfig struct {

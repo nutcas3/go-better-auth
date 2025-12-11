@@ -28,17 +28,11 @@
   - Prefer to use `any` instead of `interface{}` for better readability.
 
 - Project Layout (Go Clean Architecture):
-
   - Organize the codebase into the following main layers:
-    - `domain/`: Contains domain models (entities), domain-specific interfaces, and business rules. This layer is independent of frameworks and external libraries.
-    - `usecase/`: Contains application-specific business logic (use cases) that orchestrate domain operations. Use cases depend only on the domain layer and define interfaces for repositories and external services.
-    - `repository/`: Contains implementations of repository interfaces defined in the domain or usecase layers. Handles data persistence and external service integration.
-    - `handler/`: Contains HTTP handlers, gRPC servers, or other delivery mechanisms. Responsible for parsing requests, invoking use cases, and formatting responses.
-    - `infrastructure/`: Contains concrete implementations for database access, external APIs, logging, configuration, etc. Implements interfaces defined in the domain or usecase layers.
-  - Each feature or domain should have its own subfolder within these layers (e.g., `domain/user`, `usecase/user`, `repository/user`).
-  - Dependencies should always point inward: handler/infrastructure → usecase → domain.
-  - Use dependency injection to provide implementations to use cases and handlers.
-  - Keep domain and usecase layers free of framework-specific code for maximum testability and portability.
+    - `pkg/domain/`: Contains domain models (entities), domain-specific interfaces. This layer is independent of frameworks and external libraries.
+    - `internal/`: Contains business logic inside of `auth`, `handlers` and `middleware` as well as `util` for utilities.
+  - Use dependency injection to provide implementations to auth and handlers.
+  - Keep domain free of framework-specific code for maximum testability and portability.
   - Make sure to add relevant json tags to structs that will be serialized to/from JSON especially if it's part of the request/response lifecycle between the frontend and backend.
 
 - Modular Design:

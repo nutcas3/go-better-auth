@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"log/slog"
+	"maps"
 	"net/http"
 
 	"github.com/GoBetterAuth/go-better-auth/internal/auth"
@@ -14,7 +15,7 @@ import (
 
 type responseBuffer struct {
 	status  int
-	header  http.Header
+	header  map[string][]string
 	body    bytes.Buffer
 	written bool
 }
@@ -46,23 +47,19 @@ func EndpointHooksMiddleware(config *domain.Config, authService *auth.Service) f
 			hookCtx := &domain.EndpointHookContext{
 				Path:            r.URL.Path,
 				Method:          r.Method,
-				Headers:         make(map[string]string),
-				Query:           make(map[string]string),
+				Headers:         make(map[string][]string),
+				Query:           make(map[string][]string),
 				Request:         r,
-				ResponseHeaders: make(map[string]string),
+				ResponseHeaders: make(map[string][]string),
 			}
 
 			for k, v := range r.Header {
 				if len(v) > 0 {
-					hookCtx.Headers[k] = v[0]
+					hookCtx.Headers[k] = v
 				}
 			}
 
-			for k, v := range r.URL.Query() {
-				if len(v) > 0 {
-					hookCtx.Query[k] = v[0]
-				}
-			}
+			hookCtx.Query = r.URL.Query()
 
 			if r.Body != nil {
 				bodyBytes, err := io.ReadAll(r.Body)
@@ -98,11 +95,7 @@ func EndpointHooksMiddleware(config *domain.Config, authService *auth.Service) f
 					return
 				}
 
-				if len(hookCtx.ResponseHeaders) > 0 {
-					for k, v := range hookCtx.ResponseHeaders {
-						w.Header().Set(k, v)
-					}
-				}
+				maps.Copy(w.Header(), hookCtx.ResponseHeaders)
 
 				if len(hookCtx.ResponseCookies) > 0 {
 					for _, cookie := range hookCtx.ResponseCookies {
@@ -125,7 +118,7 @@ func EndpointHooksMiddleware(config *domain.Config, authService *auth.Service) f
 
 			if config.EndpointHooks.Response != nil {
 				buf := &responseBuffer{
-					header: make(http.Header),
+					header: make(map[string][]string),
 				}
 				next.ServeHTTP(buf, r)
 
@@ -133,7 +126,7 @@ func EndpointHooksMiddleware(config *domain.Config, authService *auth.Service) f
 				hookCtx.ResponseBody = buf.body.Bytes()
 				for k, v := range buf.header {
 					if len(v) > 0 {
-						hookCtx.ResponseHeaders[k] = v[0]
+						hookCtx.ResponseHeaders[k] = v
 					}
 				}
 
@@ -144,9 +137,7 @@ func EndpointHooksMiddleware(config *domain.Config, authService *auth.Service) f
 				}
 
 				// Write final response
-				for k, v := range hookCtx.ResponseHeaders {
-					w.Header().Set(k, v)
-				}
+				maps.Copy(w.Header(), hookCtx.ResponseHeaders)
 
 				if len(hookCtx.ResponseCookies) > 0 {
 					for _, cookie := range hookCtx.ResponseCookies {

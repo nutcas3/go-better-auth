@@ -54,7 +54,7 @@ func TestEndpointHooksMiddleware_Response_JSONToHTML(t *testing.T) {
 		domain.WithEndpointHooks(domain.EndpointHooksConfig{
 			Response: func(ctx *domain.EndpointHookContext) error {
 				// Check if original response was JSON
-				if ctx.ResponseHeaders["Content-Type"] == "application/json" {
+				if len(ctx.ResponseHeaders["Content-Type"]) > 0 && ctx.ResponseHeaders["Content-Type"][0] == "application/json" {
 					var response struct {
 						Message string `json:"message"`
 					}
@@ -64,7 +64,7 @@ func TestEndpointHooksMiddleware_Response_JSONToHTML(t *testing.T) {
 
 					// Replace with HTML response
 					ctx.ResponseBody = fmt.Appendf(nil, "<html><body><h1>%s</h1></body></html>", response.Message)
-					ctx.ResponseHeaders["Content-Type"] = "text/html"
+					ctx.ResponseHeaders["Content-Type"] = []string{"text/html"}
 				}
 				return nil
 			},
