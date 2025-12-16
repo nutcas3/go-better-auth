@@ -39,6 +39,7 @@
 - 🧩 **Comprehensive Configuration** – Flexible, type-safe config with sensible defaults and environment variable support.
 - 🛡️ **Enhanced Security** – CSRF protection.
 - ⚡ **Rate Limiting** – Configurable rate limiting with secondary storage.
+- 📨 **Event Bus** – Built-in event bus enables event-driven architecture, allowing you to publish and subscribe to authentication and authorization events for seamless integration with external systems and custom workflows.
 - 🔌 **Plugin System** – Extensible plugin architecture for custom business logic and routes. Including flexible plugin interface to implement all kinds of plugins.
 
 ---
