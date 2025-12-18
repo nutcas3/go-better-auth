@@ -15,22 +15,56 @@ type ctxKey string
 
 const ContextUserID ctxKey = "user_id"
 
+// getUserIDFromCookie extracts the user ID from the session cookie.
+// Returns an error if the cookie is missing, invalid, or session is not found.
+func getUserIDFromCookie(authService *auth.Service, cookieName string, r *http.Request) (string, error) {
+	cookie, err := r.Cookie(cookieName)
+	if err != nil || cookie.Value == "" {
+		return "", err
+	}
+
+	sess, err := authService.SessionService.GetSessionByToken(authService.TokenService.HashToken(cookie.Value))
+	if err != nil || sess == nil {
+		return "", err
+	}
+
+	return sess.UserID, nil
+}
+
+// validateCSRF checks the CSRF token from cookie and header.
+// Returns an error if validation fails.
+func validateCSRF(csrfConfig models.CSRFConfig, r *http.Request) error {
+	if !csrfConfig.Enabled {
+		return nil
+	}
+
+	cookie, err := r.Cookie(csrfConfig.CookieName)
+	if err != nil {
+		return err
+	}
+
+	header := r.Header.Get(csrfConfig.HeaderName)
+	if header == "" {
+		return err
+	}
+
+	if subtle.ConstantTimeCompare([]byte(cookie.Value), []byte(header)) != 1 {
+		return err
+	}
+
+	return nil
+}
+
 func AuthMiddleware(authService *auth.Service, cookieName string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie(cookieName)
-			if err != nil || cookie.Value == "" {
+			userID, err := getUserIDFromCookie(authService, cookieName, r)
+			if err != nil {
 				util.JSONResponse(w, http.StatusUnauthorized, map[string]any{"message": "unauthorized"})
 				return
 			}
 
-			sess, err := authService.SessionService.GetSessionByToken(authService.TokenService.HashToken(cookie.Value))
-			if err != nil || sess == nil {
-				util.JSONResponse(w, http.StatusUnauthorized, map[string]any{"message": "invalid session"})
-				return
-			}
-
-			ctx := context.WithValue(r.Context(), ContextUserID, sess.UserID)
+			ctx := context.WithValue(r.Context(), ContextUserID, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -39,13 +73,10 @@ func AuthMiddleware(authService *auth.Service, cookieName string) func(http.Hand
 func OptionalAuthMiddleware(authService *auth.Service, cookieName string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie(cookieName)
-			if err == nil && cookie.Value != "" {
-				if sess, _ := authService.SessionService.GetSessionByToken(authService.TokenService.HashToken(cookie.Value)); sess != nil {
-					r = r.WithContext(context.WithValue(r.Context(), ContextUserID, sess.UserID))
-				}
+			if userID, err := getUserIDFromCookie(authService, cookieName, r); err == nil {
+				ctx := context.WithValue(r.Context(), ContextUserID, userID)
+				r = r.WithContext(ctx)
 			}
-
 			next.ServeHTTP(w, r)
 		})
 	}
@@ -86,25 +117,23 @@ func CSRFMiddleware(csrfConfig models.CSRFConfig) func(http.Handler) http.Handle
 				return
 			}
 
-			if !csrfConfig.Enabled {
-				next.ServeHTTP(w, r)
-				return
-			}
-
-			cookie, err := r.Cookie(csrfConfig.CookieName)
-			if err != nil {
-				util.JSONResponse(w, http.StatusForbidden, map[string]any{"message": "missing CSRF cookie"})
-				return
-			}
-
-			header := r.Header.Get(csrfConfig.HeaderName)
-			if header == "" {
-				util.JSONResponse(w, http.StatusForbidden, map[string]any{"message": "missing CSRF header"})
-				return
-			}
-
-			if subtle.ConstantTimeCompare([]byte(cookie.Value), []byte(header)) != 1 {
+			if err := validateCSRF(csrfConfig, r); err != nil {
 				util.JSONResponse(w, http.StatusForbidden, map[string]any{"message": "invalid CSRF token"})
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+// RedirectAuthMiddleware redirects unauthenticated users to the specified URL.
+func RedirectAuthMiddleware(authService *auth.Service, cookieName string, redirectURL string, status int) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			userID, err := getUserIDFromCookie(authService, cookieName, r)
+			if err != nil || userID == "" {
+				http.Redirect(w, r, redirectURL, status)
 				return
 			}
 

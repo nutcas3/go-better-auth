@@ -221,6 +221,10 @@ func (auth *Auth) EndpointHooksMiddleware() func(http.Handler) http.Handler {
 	return middleware.EndpointHooksMiddleware(auth.Config, auth.service)
 }
 
+func (auth *Auth) RedirectAuthMiddleware(redirectURL string, status int) func(http.Handler) http.Handler {
+	return middleware.RedirectAuthMiddleware(auth.service, auth.Config.Session.CookieName, redirectURL, status)
+}
+
 func (auth *Auth) GetUserIDFromContext(ctx context.Context) (string, bool) {
 	value := ctx.Value(middleware.ContextUserID)
 	if value == nil {
