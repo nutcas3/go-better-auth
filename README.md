@@ -39,6 +39,7 @@
 - 🧩 **Comprehensive Configuration** – Flexible, type-safe config with sensible defaults and environment variable support.
 - 🛡️ **Enhanced Security** – CSRF protection.
 - ⚡ **Rate Limiting** – Configurable rate limiting with secondary storage.
+- 🪝 **Hooks System** – Powerful hooks for deep customisation: Database hooks allow developers to hook into DB events like BeforeCreate and AfterCreate on entities, plus create custom ones in plugins. Event hooks execute after key actions, enabling event-driven workflows. Endpoint hooks allow you to integrate into the request/response lifecycle giving you the ability to modify requests/responses.
 - 📨 **Event Bus** – Built-in event bus enables event-driven architecture, allowing you to publish and subscribe to authentication and authorization events for seamless integration with external systems and custom workflows.
 - 🔌 **Plugin System** – Extensible plugin architecture for custom business logic and routes. Including flexible plugin interface to implement all kinds of plugins.
 
