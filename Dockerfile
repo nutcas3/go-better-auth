@@ -4,9 +4,6 @@
 
 FROM golang:1.25.5-alpine AS builder
 
-ARG VERSION=dev
-ARG BUILD_DATE=unknown
-
 WORKDIR /app
 
 # Install build dependencies
@@ -19,9 +16,8 @@ RUN go mod download
 # Copy source code
 COPY . ./
 
-# Build the application with version info
+# Build the application
 RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build \
-  -ldflags="-s -w -X main.Version=${VERSION} -X main.BuildDate=${BUILD_DATE}" \
   -o server ./cmd/main.go
 
 # -------------------
@@ -47,10 +43,6 @@ USER appuser
 
 # Expose port
 EXPOSE 8080
-
-# Metadata labels
-LABEL maintainer="GoBetterAuth"
-LABEL version="${VERSION}"
 
 ENV GO_ENV=production
 
