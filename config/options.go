@@ -24,15 +24,17 @@ func NewConfig(options ...models.ConfigOption) *models.Config {
 			MaxIdleConns:    5,
 			ConnMaxLifetime: time.Hour,
 		},
+		Email: models.EmailConfig{},
 		EmailPassword: models.EmailPasswordConfig{
 			Enabled:                  false,
 			RequireEmailVerification: false,
 			MinPasswordLength:        8,
 			MaxPasswordLength:        32,
+			ResetTokenExpiry:         1 * time.Hour,
 		},
 		EmailVerification: models.EmailVerificationConfig{
 			AutoSignIn:   false,
-			SendOnSignUp: false,
+			SendOnSignUp: true,
 			SendOnSignIn: false,
 			ExpiresIn:    1 * time.Hour,
 		},
@@ -49,6 +51,9 @@ func NewConfig(options ...models.ConfigOption) *models.Config {
 			CookieName: "gobetterauth_csrf",
 			HeaderName: "X-GOBETTERAUTH-CSRF-TOKEN",
 			ExpiresIn:  7 * 24 * time.Hour,
+		},
+		SocialProviders: models.SocialProvidersConfig{
+			Providers: map[string]models.OAuth2ProviderConfig{},
 		},
 		TrustedOrigins: models.TrustedOriginsConfig{},
 		SecondaryStorage: models.SecondaryStorageConfig{
@@ -74,6 +79,7 @@ func NewConfig(options ...models.ConfigOption) *models.Config {
 			Enabled:               false,
 			MaxConcurrentHandlers: 10,
 		},
+		Plugins: models.PluginsConfig{},
 	}
 
 	// Apply the options
