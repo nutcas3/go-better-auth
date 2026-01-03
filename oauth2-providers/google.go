@@ -27,10 +27,10 @@ type GoogleProvider struct {
 }
 
 func NewGoogleProvider(config *models.OAuth2ProviderConfig) *GoogleProvider {
-	if envClientID := os.Getenv(env.GoogleClientID); envClientID != "" {
+	if envClientID := os.Getenv(env.EnvGoogleClientID); envClientID != "" {
 		config.ClientID = envClientID
 	}
-	if envClientSecret := os.Getenv(env.GoogleClientSecret); envClientSecret != "" {
+	if envClientSecret := os.Getenv(env.EnvGoogleClientSecret); envClientSecret != "" {
 		config.ClientSecret = envClientSecret
 	}
 	return &GoogleProvider{config: config}

@@ -78,7 +78,7 @@ func New(baseConfig *models.Config) *Auth {
 		EventBus:      eventBus,
 	}
 
-	apiKey := os.Getenv(env.AdminApiKey)
+	apiKey := os.Getenv(env.EnvAdminApiKey)
 	adminAuth := func() func(http.Handler) http.Handler {
 		return middleware.AdminAuth(apiKey)
 	}

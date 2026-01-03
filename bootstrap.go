@@ -84,10 +84,10 @@ func InitDatabase(config *models.Config) (*gorm.DB, error) {
 		return nil, fmt.Errorf("database provider must be specified")
 	}
 
-	databaseUrl := os.Getenv(env.DatabaseURL)
+	databaseUrl := os.Getenv(env.EnvDatabaseURL)
 	if databaseUrl == "" {
 		if config.Database.URL == "" {
-			return nil, fmt.Errorf("database connection string must be specified via %s environment variable or config", env.DatabaseURL)
+			return nil, fmt.Errorf("database connection string must be specified via %s environment variable or config", env.EnvDatabaseURL)
 		} else {
 			databaseUrl = config.Database.URL
 		}

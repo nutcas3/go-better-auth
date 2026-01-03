@@ -33,10 +33,10 @@ type GitHubProvider struct {
 }
 
 func NewGitHubProvider(config *models.OAuth2ProviderConfig) *GitHubProvider {
-	if envClientID := os.Getenv(env.GithubClientID); envClientID != "" {
+	if envClientID := os.Getenv(env.EnvGithubClientID); envClientID != "" {
 		config.ClientID = envClientID
 	}
-	if envClientSecret := os.Getenv(env.GithubClientSecret); envClientSecret != "" {
+	if envClientSecret := os.Getenv(env.EnvGithubClientSecret); envClientSecret != "" {
 		config.ClientSecret = envClientSecret
 	}
 	return &GitHubProvider{config: config}

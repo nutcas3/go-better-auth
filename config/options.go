@@ -94,8 +94,8 @@ func NewConfig(options ...models.ConfigOption) *models.Config {
 	}
 
 	// Validate production configuration
-	if os.Getenv(env.GoEnvironment) == "production" && config.Secret == defaultSecret {
-		panic(fmt.Sprintf("A custom secret must be set in production mode. Please set a custom secret via configuration or the %s environment variable.", env.Secret))
+	if os.Getenv(env.EnvGoEnvironment) == "production" && config.Secret == defaultSecret {
+		panic(fmt.Sprintf("A custom secret must be set in production mode. Please set a custom secret via configuration or the %s environment variable.", env.EnvSecret))
 	}
 
 	return config
@@ -116,7 +116,7 @@ func WithAppName(name string) models.ConfigOption {
 
 func WithBaseURL(url string) models.ConfigOption {
 	return func(c *models.Config) {
-		if envValue := os.Getenv(env.BaseURL); envValue != "" {
+		if envValue := os.Getenv(env.EnvBaseURL); envValue != "" {
 			c.BaseURL = envValue
 		} else if url != "" {
 			c.BaseURL = url
@@ -134,7 +134,7 @@ func WithBasePath(path string) models.ConfigOption {
 
 func WithSecret(secret string) models.ConfigOption {
 	return func(c *models.Config) {
-		if envValue := os.Getenv(env.Secret); envValue != "" {
+		if envValue := os.Getenv(env.EnvSecret); envValue != "" {
 			c.Secret = envValue
 		} else if secret != "" {
 			c.Secret = secret

@@ -54,7 +54,7 @@ func loadConfig() (*gobetterauthmodels.Config, error) {
 	_ = godotenv.Load(".env")
 
 	v := viper.New()
-	configPath := getEnv(gobetterauthenv.ConfigPath, "config.toml")
+	configPath := getEnv(gobetterauthenv.EnvConfigPath, "config.toml")
 	v.SetConfigFile(configPath)
 	v.SetConfigType("toml")
 	if err := v.ReadInConfig(); err != nil {
@@ -102,7 +102,7 @@ func loadConfig() (*gobetterauthmodels.Config, error) {
 
 // runServer starts the HTTP server and handles restarts
 func runServer(logger gobetterauthmodels.Logger, restartChan chan struct{}, shutdownChan chan os.Signal) error {
-	port := getEnv("PORT", "8080")
+	port := getEnv(gobetterauthenv.EnvPort, "8080")
 
 	config, err := loadConfig()
 	if err != nil {

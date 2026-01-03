@@ -27,10 +27,10 @@ type DiscordProvider struct {
 }
 
 func NewDiscordProvider(config *models.OAuth2ProviderConfig) *DiscordProvider {
-	if envClientID := os.Getenv(env.DiscordClientID); envClientID != "" {
+	if envClientID := os.Getenv(env.EnvDiscordClientID); envClientID != "" {
 		config.ClientID = envClientID
 	}
-	if envClientSecret := os.Getenv(env.DiscordClientSecret); envClientSecret != "" {
+	if envClientSecret := os.Getenv(env.EnvDiscordClientSecret); envClientSecret != "" {
 		config.ClientSecret = envClientSecret
 	}
 	return &DiscordProvider{
